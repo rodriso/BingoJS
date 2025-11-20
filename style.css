@@ -1,0 +1,79 @@
+#cuadriculaBingo .extraida {
+    /* Estilos que ya tenías para la bola extraída, ¡ahora se ven mucho mejor! */
+    background-color: #91908d; /* Fondo amarillo */
+    color: #333;
+    font-weight: bold;
+}
+
+
+#cuadriculaBingo {
+    /* Mantén el Flexbox y el wrap */
+    display: flex;
+    flex-wrap: wrap; 
+    
+    max-width: 550px;
+    
+    margin-left: auto;
+    margin-right: auto;
+    border: 2px solid #333;
+    
+    padding: 10px;
+}
+
+#cuadriculaBingo span { 
+    width: 9%; 
+    padding-bottom: 9%; 
+    height: 0;
+    
+    text-align: center;
+    line-height: 50px;
+
+    margin: 5px 0.25%; 
+    height: 0;
+    position: relative; 
+    border-radius: 50%;
+    border: 1px solid #141414;
+}
+
+button {
+    background-color: orange;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.controles {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    gap: 20px; 
+}
+
+h1 {
+   
+    font-family: Arial, sans-serif; 
+    font-size: 3em; 
+    font-weight: 700;
+
+    
+   
+    color: #333; 
+    background-color: #f8f8f8; 
+    
+   
+    text-align: center; 
+    margin-top: 20px; 
+    padding: 10px; 
+    border-bottom: 3px solid gold;
+    text-transform: uppercase;
+}
+
+p {
+    font-family: Arial, sans-serif; 
+    font-size: 2.5em; 
+    font-weight: 700; 
+    text-align: center; 
+      
+}

@@ -1,10 +1,28 @@
+
+
+// Elementos de HTML
+const displayCuadricula = document.getElementById('cuadriculaBingo');
+const boton = document.getElementById('botonExtraer');
+const displayResultado = document.getElementById('resultado');
+const displayListaNumeros = document.getElementById('listaBolas');
+const botonIniciar = document.getElementById('botonIniciar');
+const botonPausar = document.getElementById('botonPausar');
+
+//Variables 
 const TOTAL_BOLAS = 90;
 const bolasExtraidas = [];
+const VELOCIDAD = 3000;
+let intervaloId = null;
+
+//Funciones 
+
+//Generar un numero random del 1 al 90
 const generarNumero = () => {return Math.floor(Math.random() * TOTAL_BOLAS) + 1;} 
 
+//Extraer la siguiente bola del bombo 
 function extraerBola(){
 if (bolasExtraidas.length == TOTAL_BOLAS){
-    return "¡Juego terminado! Alguien ha tenido que cantar bingo"
+    return null
 }
 let ultimaBola;
 do{
@@ -17,19 +35,65 @@ return ultimaBola;
 }
 
 
+// Inicializar cuadricula
 
-const boton = document.getElementById('botonExtraer');
-const displayResultado = document.getElementById('resultado');
-const displayListaNumeros = document.getElementById('listaBolas');
+function inicializarCuadricula(){
+    for (let i = 1; i <= TOTAL_BOLAS; i++){
+        // Creamos un elemento de tipo span
+        const numeroElemento = document.createElement('span');
 
-function manejarExtraccion() {
+        // A este elemento se le mete el número de la lista
+        numeroElemento.textContent = i;
 
-    const mensaje = extraerBola();
-    displayListaNumeros.textContent = bolasExtraidas
-    
+        //Se le asigna una id 
+        numeroElemento.id = `bola-${i}`;
 
-    displayResultado.textContent = mensaje;
+        //Se le añade al div padre
+        displayCuadricula.appendChild(numeroElemento);
 
+    }
 }
 
-boton.addEventListener('click', manejarExtraccion);
+// Edición de los elementos del html al extraer una bola.
+function manejarExtraccion() {
+    const bola = extraerBola();
+    if (bola != null){
+        displayResultado.textContent = bola;
+        const elementoAMarcar = document.getElementById(`bola-${bola}`);
+        elementoAMarcar.classList.add('extraida');
+    }
+    else{
+        pausarBingo();
+        displayResultado.textContent = "Fin";
+    }
+}
+
+function iniciarBingo() {
+    // 1. Verificar si ya está corriendo para evitar múltiples temporizadores
+    if (intervaloId !== null) return; 
+
+    //Iniciar el temporizador
+    intervaloId = setInterval(manejarExtraccion, VELOCIDAD);
+    
+    //Actualizar la interfaz
+    botonIniciar.disabled = true; // Desactivar Iniciar
+    botonPausar.disabled = false; // Activar Pausar
+    displayResultado.textContent = "¡BINGO EN CURSO!";
+}
+
+function pausarBingo() {
+   
+    clearInterval(intervaloId);
+    botonIniciar.textContent = "Continuar Bingo"
+
+    intervaloId = null; 
+
+    botonIniciar.disabled = false; // Activar Iniciar
+    botonPausar.disabled = true; // Desactivar Pausar
+    displayResultado.textContent = "BINGO PAUSADO. Revisando cartones...";
+}
+
+botonIniciar.addEventListener('click', iniciarBingo);
+botonPausar.disabled = true;
+botonPausar.addEventListener('click', pausarBingo);
+inicializarCuadricula();
