@@ -13,6 +13,7 @@ const TOTAL_BOLAS = 90;
 const bolasExtraidas = [];
 const VELOCIDAD = 3000;
 let intervaloId = null;
+const CARPETA_AUDIO = 'audio/';
 
 //Funciones 
 
@@ -61,11 +62,21 @@ function manejarExtraccion() {
         displayResultado.textContent = bola;
         const elementoAMarcar = document.getElementById(`bola-${bola}`);
         elementoAMarcar.classList.add('extraida');
+        reproducirSonido(bola);
     }
     else{
         pausarBingo();
         displayResultado.textContent = "Fin";
     }
+}
+
+function reproducirSonido(numero) {
+
+    const rutaAudio = `${CARPETA_AUDIO}${numero}.mp3`;
+    const audio = new Audio(rutaAudio);
+    audio.play().catch(error => {
+        console.error("Error al intentar reproducir el audio:", error);
+    });
 }
 
 function iniciarBingo() {
@@ -76,9 +87,13 @@ function iniciarBingo() {
     intervaloId = setInterval(manejarExtraccion, VELOCIDAD);
     
     //Actualizar la interfaz
-    botonIniciar.disabled = true; // Desactivar Iniciar
-    botonPausar.disabled = false; // Activar Pausar
+    accionesSobreBotones(); // Activar Pausar
     displayResultado.textContent = "¡BINGO EN CURSO!";
+
+    function accionesSobreBotones() {
+        botonIniciar.disabled = true; // Desactivar Iniciar
+        botonPausar.disabled = false;
+    }
 }
 
 function pausarBingo() {
@@ -88,9 +103,13 @@ function pausarBingo() {
 
     intervaloId = null; 
 
-    botonIniciar.disabled = false; // Activar Iniciar
-    botonPausar.disabled = true; // Desactivar Pausar
+    accionesSobreBotones(); // Desactivar Pausar
     displayResultado.textContent = "BINGO PAUSADO. Revisando cartones...";
+
+    function accionesSobreBotones() {
+        botonIniciar.disabled = false; // Activar Iniciar
+        botonPausar.disabled = true;
+    }
 }
 
 botonIniciar.addEventListener('click', iniciarBingo);
