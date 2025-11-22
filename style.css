@@ -12,11 +12,10 @@
     flex-wrap: wrap; 
     
     max-width: 500px;
-    
     margin-left: auto;
     margin-right: auto;
-    border: 2px solid #333;
-    
+    border: 4px solid #333;
+    border-radius: 5px;
     padding: 10px;
 }
 
@@ -24,15 +23,15 @@
     width: 9%; 
     padding-bottom: 9%; 
     height: 0;
-    
+    font-weight: bold;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     text-align: center;
     line-height: 50px;
-
     margin: 5px 0.25%; 
     height: 0;
     position: relative; 
     border-radius: 50%;
-    border: 1px solid #141414;
+    border: 1.7px solid #000000;
 }
 
 button {
@@ -53,8 +52,8 @@ button {
 
 h1 {
    
-    font-family: Arial, sans-serif; 
-    font-size: 3em; 
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; 
+    font-size: 5em; 
     font-weight: 700;
 
     
@@ -64,9 +63,8 @@ h1 {
     
    
     text-align: center; 
-    margin-top: 20px; 
-    padding: 10px; 
-    border-bottom: 3px solid gold;
+    margin-top: 5px;  
+    border-bottom: 4px solid firebrick;
     text-transform: uppercase;
 }
 
@@ -76,4 +74,12 @@ p {
     font-weight: 700; 
     text-align: center; 
       
+}
+
+.velocidad-control {
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center; /* Alinea los elementos verticalmente (etiqueta y slider) */
+    margin-bottom: 15px;
+    gap: 15px; /* Espacio entre los elementos */
 }

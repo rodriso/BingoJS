@@ -7,6 +7,8 @@ const displayResultado = document.getElementById('resultado');
 const displayListaNumeros = document.getElementById('listaBolas');
 const botonIniciar = document.getElementById('botonIniciar');
 const botonPausar = document.getElementById('botonPausar');
+const selectorVelocidad = document.getElementById('selectorVelocidad');
+const valorVelocidadDisplay = document.getElementById('valorVelocidad');
 
 //Variables 
 const TOTAL_BOLAS = 90;
@@ -20,10 +22,18 @@ const CARPETA_AUDIO = 'audio/';
 //Generar un numero random del 1 al 90
 const generarNumero = () => {return Math.floor(Math.random() * TOTAL_BOLAS) + 1;} 
 
+function actualizarDisplayVelocidad() {
+    // Lee el valor del selector (que está en segundos)
+    const segundos = selectorVelocidad.value;
+    valorVelocidadDisplay.textContent = `${segundos} segundos`;
+}
+
+selectorVelocidad.addEventListener('input', actualizarDisplayVelocidad);
+
 //Extraer la siguiente bola del bombo 
 function extraerBola(){
 if (bolasExtraidas.length == TOTAL_BOLAS){
-    return null
+    return false
 }
 let ultimaBola;
 do{
@@ -58,7 +68,7 @@ function inicializarCuadricula(){
 // Edición de los elementos del html al extraer una bola.
 function manejarExtraccion() {
     const bola = extraerBola();
-    if (bola != null){
+    if (bola != false){
         displayResultado.textContent = bola;
         const elementoAMarcar = document.getElementById(`bola-${bola}`);
         elementoAMarcar.classList.add('extraida');
@@ -79,40 +89,47 @@ function reproducirSonido(numero) {
     });
 }
 
+function actualizarControles(iniciarDesactivado) {
+    botonIniciar.disabled = iniciarDesactivado;
+    botonPausar.disabled = !iniciarDesactivado; // Pausar es lo opuesto a Iniciar
+}
+
 function iniciarBingo() {
-    // 1. Verificar si ya está corriendo para evitar múltiples temporizadores
     if (intervaloId !== null) return; 
 
-    //Iniciar el temporizador
-    intervaloId = setInterval(manejarExtraccion, VELOCIDAD);
-    
-    //Actualizar la interfaz
-    accionesSobreBotones(); // Activar Pausar
+    const velocidadMilisegundos = obtenerVelocidadUsuario(); // Convertir a ms
+
+    // Iniciar el temporizador usando el valor dinámico
+    intervaloId = setInterval(manejarExtraccion, velocidadMilisegundos);
+
+    actualizarControles(true);
+
+    botonIniciar.textContent = "Continuar Bingo"; //Cambio texto de botón de iniciar a continuar
     displayResultado.textContent = "¡BINGO EN CURSO!";
 
-    function accionesSobreBotones() {
-        botonIniciar.disabled = true; // Desactivar Iniciar
-        botonPausar.disabled = false;
-    }
+    // Desactivar el selector de velocidad mientras el juego está activo
+    selectorVelocidad.disabled = true; 
+}
+
+
+function obtenerVelocidadUsuario() {
+    const segundosSeleccionados = parseInt(selectorVelocidad.value); // Obtiene el valor (3-10)
+    const velocidadMilisegundos = segundosSeleccionados * 1000; // Convertir a ms
+    return velocidadMilisegundos;
 }
 
 function pausarBingo() {
    
     clearInterval(intervaloId);
     botonIniciar.textContent = "Continuar Bingo"
-
     intervaloId = null; 
-
-    accionesSobreBotones(); // Desactivar Pausar
+    actualizarControles(false); // Desactivar Pausar
     displayResultado.textContent = "BINGO PAUSADO. Revisando cartones...";
-
-    function accionesSobreBotones() {
-        botonIniciar.disabled = false; // Activar Iniciar
-        botonPausar.disabled = true;
-    }
 }
 
+
+
 botonIniciar.addEventListener('click', iniciarBingo);
-botonPausar.disabled = true;
 botonPausar.addEventListener('click', pausarBingo);
 inicializarCuadricula();
+actualizarControles(false);
