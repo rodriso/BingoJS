@@ -27,6 +27,7 @@ class BingoGame {
         this.mezclarBolas();
         this.bolasExtraidas = [];
         this.enJuego = false;
+        this.guardarEstado(); // Guardar estado inicial
         if (this.onEstadoCambio) this.onEstadoCambio(this.enJuego);
     }
 
@@ -52,6 +53,7 @@ class BingoGame {
 
         const bola = this.bolas.pop();
         this.bolasExtraidas.push(bola);
+        this.guardarEstado(); // Guardar tras cada extracción
 
         if (this.onBolaExtraida) {
             this.onBolaExtraida(bola);
@@ -96,6 +98,40 @@ class BingoGame {
             this.onJuegoTerminado();
         }
     }
+
+    // --- Persistencia ---
+
+    guardarEstado() {
+        const estado = {
+            bolas: this.bolas,
+            bolasExtraidas: this.bolasExtraidas
+        };
+        localStorage.setItem('bingoState', JSON.stringify(estado));
+    }
+
+    cargarEstado() {
+        const estadoGuardado = localStorage.getItem('bingoState');
+        if (estadoGuardado) {
+            try {
+                const estado = JSON.parse(estadoGuardado);
+                // Validar que el estado tenga sentido
+                if (Array.isArray(estado.bolas) && Array.isArray(estado.bolasExtraidas)) {
+                    this.bolas = estado.bolas;
+                    this.bolasExtraidas = estado.bolasExtraidas;
+                    this.enJuego = false; // Siempre cargar pausado
+                    return true;
+                }
+            } catch (e) {
+                console.error("Error al cargar estado:", e);
+            }
+        }
+        return false;
+    }
+
+    reiniciar() {
+        localStorage.removeItem('bingoState');
+        this.inicializar();
+    }
 }
 
 // --- Lógica de UI ---
@@ -106,10 +142,9 @@ const elements = {
     resultado: document.getElementById('resultado'),
     botonIniciar: document.getElementById('botonIniciar'),
     botonPausar: document.getElementById('botonPausar'),
+    botonReiniciar: document.getElementById('botonReiniciar'), // Nuevo botón
     selectorVelocidad: document.getElementById('selectorVelocidad'),
-    valorVelocidad: document.getElementById('valorVelocidad'),
-    bolaAnimada: document.getElementById('bola-animada'),
-    textoBolaAnimada: document.getElementById('texto-bola-animada')
+    valorVelocidad: document.getElementById('valorVelocidad')
 };
 
 // Constantes
@@ -151,35 +186,13 @@ function marcarBolaEnCuadricula(numero) {
     }
 }
 
-function animarBola(bola) {
-    // Resetear estado
-    elements.bolaAnimada.className = ''; // Quitar clases previas
-    elements.bolaAnimada.style.transition = 'none'; // Quitar transición para reset instantáneo
-    elements.bolaAnimada.style.transform = 'translateX(-200%) rotate(-360deg)';
-    elements.bolaAnimada.style.opacity = '0';
-    elements.textoBolaAnimada.textContent = ''; // Ocultar número mientras rueda
-
-    // Forzar reflow
-    void elements.bolaAnimada.offsetWidth;
-
-    // Iniciar animación
-    elements.bolaAnimada.style.transition = ''; // Restaurar transición CSS
-    elements.bolaAnimada.classList.add('rodando');
-
-    // Mostrar número al finalizar la animación (aprox 800ms según CSS)
-    setTimeout(() => {
-        elements.textoBolaAnimada.textContent = bola;
-        reproducirSonido(bola);
-        marcarBolaEnCuadricula(bola);
-        elements.resultado.textContent = bola;
-    }, 800);
-}
 
 // Configuración de Eventos del Juego
 
 bingo.onBolaExtraida = (bola) => {
-    // La lógica principal se mueve a animarBola para sincronizar visuales
-    animarBola(bola);
+    reproducirSonido(bola);
+    marcarBolaEnCuadricula(bola);
+    elements.resultado.textContent = bola;
 };
 
 bingo.onJuegoTerminado = () => {
@@ -193,6 +206,9 @@ bingo.onEstadoCambio = (enJuego) => {
     elements.botonIniciar.disabled = enJuego;
     elements.botonPausar.disabled = !enJuego;
     elements.selectorVelocidad.disabled = enJuego;
+    // El botón de reiniciar se puede deshabilitar si se quiere evitar reinicios accidentales durante el juego,
+    // pero por ahora lo dejaremos habilitado o podríamos deshabilitarlo si está en juego.
+    elements.botonReiniciar.disabled = enJuego;
 
     if (enJuego) {
         elements.botonIniciar.textContent = "Continuar Bingo";
@@ -221,7 +237,30 @@ elements.botonPausar.addEventListener('click', () => {
     elements.resultado.textContent = "BINGO PAUSADO";
 });
 
+elements.botonReiniciar.addEventListener('click', () => {
+    if (confirm("¿Estás seguro de que quieres reiniciar el juego? Se perderá el progreso actual.")) {
+        bingo.reiniciar();
+        // Limpiar UI
+        inicializarCuadriculaUI();
+        elements.resultado.textContent = "---";
+        actualizarDisplayVelocidad();
+    }
+});
+
 // Inicialización al cargar
 inicializarCuadriculaUI();
 actualizarDisplayVelocidad();
-bingo.inicializar(); // Prepara las bolas mezcladas para empezar
+
+// Intentar cargar estado previo
+if (bingo.cargarEstado()) {
+    // Restaurar UI
+    bingo.bolasExtraidas.forEach(bola => marcarBolaEnCuadricula(bola));
+    if (bingo.bolasExtraidas.length > 0) {
+        const ultimaBola = bingo.bolasExtraidas[bingo.bolasExtraidas.length - 1];
+        elements.resultado.textContent = ultimaBola;
+    }
+    // Asegurar estado de botones
+    bingo.onEstadoCambio(false);
+} else {
+    bingo.inicializar(); // Estado nuevo
+}
