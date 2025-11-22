@@ -1,85 +1,203 @@
-#cuadriculaBingo .extraida {
-    /* Estilos que ya tenías para la bola extraída, ¡ahora se ven mucho mejor! */
-    background-color: #91908d; /* Fondo amarillo */
+/* Reset y fuentes */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f0f8ff;
+    /* AliceBlue */
     color: #333;
-    font-weight: bold;
-}
-
-
-#cuadriculaBingo {
-    /* Mantén el Flexbox y el wrap */
+    margin: 0;
+    padding: 20px;
     display: flex;
-    flex-wrap: wrap; 
-    
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-    border: 4px solid #333;
-    border-radius: 5px;
-    padding: 10px;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
 }
 
-#cuadriculaBingo span { 
-    width: 9%; 
-    padding-bottom: 9%; 
-    height: 0;
+/* Encabezado */
+h1 {
+    font-size: 3rem;
+    color: #0056b3;
+    /* Azul oscuro */
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    border-bottom: 3px solid #2196f3;
+    padding-bottom: 10px;
+}
+
+/* Cuadrícula de Bingo */
+#cuadriculaBingo {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 520px;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 86, 179, 0.15);
+    gap: 8px;
+    margin-bottom: 30px;
+}
+
+#cuadriculaBingo span {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-weight: bold;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    text-align: center;
-    line-height: 50px;
-    margin: 5px 0.25%; 
-    height: 0;
-    position: relative; 
+    font-size: 1.1rem;
     border-radius: 50%;
-    border: 1.7px solid #000000;
+    background-color: #f8f9fa;
+    border: 2px solid #e3f2fd;
+    color: #555;
+    transition: all 0.3s ease;
+}
+
+/* Bola extraída */
+#cuadriculaBingo .extraida {
+    background-color: #2196f3;
+    /* Azul vibrante */
+    color: white;
+    border-color: #1976d2;
+    transform: scale(1.1);
+    box-shadow: 0 2px 5px rgba(33, 150, 243, 0.4);
+}
+
+/* Controles */
+.controles {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
 }
 
 button {
-    background-color: orange;
+    background-color: #0056b3;
     color: white;
-    padding: 10px 20px;
-    border-radius: 6px;
-    text-align: center;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.controles {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    gap: 20px; 
+button:hover:not(:disabled) {
+    background-color: #004494;
+    transform: translateY(-1px);
 }
 
-h1 {
-   
-    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; 
-    font-size: 5em; 
-    font-weight: 700;
-
-    
-   
-    color: #333; 
-    background-color: #f8f8f8; 
-    
-   
-    text-align: center; 
-    margin-top: 5px;  
-    border-bottom: 4px solid firebrick;
-    text-transform: uppercase;
+button:active:not(:disabled) {
+    transform: translateY(0);
 }
 
+button:disabled {
+    background-color: #b0bec5;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Resultado y Velocidad */
 p {
-    font-family: Arial, sans-serif; 
-    font-size: 2.5em; 
-    font-weight: 700; 
-    text-align: center; 
-      
+    font-size: 1.5rem;
+    color: #0056b3;
+    margin: 10px 0;
+}
+
+#resultado {
+    font-size: 2.5rem;
+    color: #2196f3;
+    font-weight: 800;
+    display: inline-block;
+    min-width: 60px;
+    text-align: center;
 }
 
 .velocidad-control {
     display: flex;
-    justify-content: center; /* Centra horizontalmente */
-    align-items: center; /* Alinea los elementos verticalmente (etiqueta y slider) */
-    margin-bottom: 15px;
-    gap: 15px; /* Espacio entre los elementos */
+    align-items: center;
+    gap: 15px;
+    background-color: white;
+    padding: 10px 20px;
+    border-radius: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin-top: 10px;
+}
+
+label {
+    font-weight: 600;
+    color: #555;
+}
+
+input[type="range"] {
+    accent-color: #2196f3;
+    cursor: pointer;
+}
+
+#valorVelocidad {
+    font-weight: bold;
+    color: #0056b3;
+    min-width: 90px;
+    text-align: right;
+}
+
+/* --- Animación de Bola Rodando --- */
+
+#escenario-bola {
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    perspective: 1000px;
+    overflow: hidden;
+}
+
+#bola-animada {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ffffff, #2196f3);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    font-weight: bold;
+    color: #0056b3;
+    position: relative;
+
+    /* Estado inicial */
+    transform: translateX(-200%) rotate(-360deg);
+    opacity: 0;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+}
+
+#bola-animada.rodando {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg);
+}
+
+#bola-animada.oculta {
+    opacity: 0;
+    transform: scale(0);
+    transition: transform 0.3s, opacity 0.3s;
+}
+
+#bola-animada::after {
+    content: '';
+    position: absolute;
+    top: 15%;
+    left: 15%;
+    width: 20%;
+    height: 20%;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    filter: blur(2px);
 }
